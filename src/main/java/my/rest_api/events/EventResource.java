@@ -2,7 +2,6 @@ package my.rest_api.events;
 
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.LinkRelation;
 
 import java.util.List;
 
