@@ -2,6 +2,7 @@ package my.rest_api.events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @EqualsAndHashCode(of = "id")
 @Entity
-public class Event {
+public class Event extends RepresentationModel<Event> {
 
     @Id
     @GeneratedValue

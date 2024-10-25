@@ -73,25 +73,10 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- JUnit 4 -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.2</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- JUnit Vintage Engine for JUnit 5 compatibility -->
 		<dependency>
 			<groupId>org.junit.vintage</groupId>
 			<artifactId>junit-vintage-engine</artifactId>
-			<version>5.9.3</version> <!-- 최신 버전 사용 권장 -->
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-params</artifactId>
-			<version>5.4.2</version>
+			<version>5.9.3</version>
 			<scope>test</scope>
 		</dependency>
 
