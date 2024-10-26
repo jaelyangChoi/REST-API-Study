@@ -1,10 +1,10 @@
 package my.rest_api.events;
 
-import my.rest_api.common.BaseControllerTest;
+import my.rest_api.common.BaseTest;
 import my.rest_api.common.TestDescription;
 import org.hamcrest.Matchers;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-public class EventControllerTest extends BaseControllerTest {
+public class EventControllerTest extends BaseTest {
 
     @Autowired
     EventRepository eventRepository;
