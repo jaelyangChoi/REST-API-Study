@@ -18,8 +18,10 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 
 @RequiredArgsConstructor
@@ -60,12 +62,21 @@ public class EventController {
         PagedModel<EntityModel<Event>> pagedResources = assembler.toModel(page, EventResource::new);
         pagedResources.add(Link.of("/docs/index.html#resources-events-list").withRel("profile"));
         return ResponseEntity.ok().body(pagedResources);
-
     }
 
     private static ResponseEntity<ErrorsResource> badRequest(Errors errors) {
         return ResponseEntity.badRequest().body(new ErrorsResource(errors));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity getEvent(@PathVariable Integer id) {
+        Optional<Event> optionalEvent = eventRepository.findById(id);
+        if (optionalEvent.isEmpty()) {
+            return ResponseEntity.notFound().build(); //build()는 응답 구성을 완료하고 최종 객체를 반환하는 데 사용
+        }
 
+        EventResource eventResource = new EventResource(optionalEvent.get());
+        eventResource.add(Link.of("/docs/index.html#resources-events-get").withRel("profile"));
+        return ResponseEntity.ok().body(eventResource); //build()를 생략할 수 있다
+    }
 }
