@@ -41,6 +41,7 @@ public class EventController {
         if (errors.hasErrors()) {
             return badRequest(errors);
         }
+
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
         Event newEvent = this.eventRepository.save(event);
