@@ -21,7 +21,6 @@ import java.net.URI;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 
 @RequiredArgsConstructor
@@ -78,5 +77,34 @@ public class EventController {
         EventResource eventResource = new EventResource(optionalEvent.get());
         eventResource.add(Link.of("/docs/index.html#resources-events-get").withRel("profile"));
         return ResponseEntity.ok().body(eventResource); //build()를 생략할 수 있다
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity updateEntity(@PathVariable Integer id,
+                                       @RequestBody @Valid EventDto eventDto,
+                                       Errors errors) {
+        Optional<Event> optionalEvent = eventRepository.findById(id);
+        if (optionalEvent.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (errors.hasErrors()) {
+            return badRequest(errors);
+        }
+
+        eventValidator.validate(eventDto, errors);
+        if (errors.hasErrors()) {
+            return badRequest(errors);
+        }
+
+        //Service 없이 merge 이용
+        Event existingEvent = optionalEvent.get();
+        modelMapper.map(eventDto, existingEvent); //기존 이벤트에 덮어씌움
+        Event savedEvent = eventRepository.save(existingEvent);
+
+        EventResource eventResource = new EventResource(savedEvent);
+        eventResource.add(Link.of("/docs/index.html#resources-events-update").withRel("profile"));
+
+        return ResponseEntity.ok().body(eventResource);
     }
 }
