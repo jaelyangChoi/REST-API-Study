@@ -2,6 +2,7 @@ package my.rest_api.events;
 
 import jakarta.persistence.*;
 import lombok.*;
+import my.rest_api.accounts.Account;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @EqualsAndHashCode(of = "id")
 @Entity
-public class Event extends RepresentationModel<Event> {
+public class Event {
 
     @Id
     @GeneratedValue
@@ -32,6 +33,9 @@ public class Event extends RepresentationModel<Event> {
     private boolean free;
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
+
+    @ManyToOne
+    private Account manager;
 
     public void update() {
         // Update free
