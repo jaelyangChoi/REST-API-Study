@@ -1,23 +1,19 @@
 package my.rest_api.accounts;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 내가 정의한 Account 객체를 Spring Security 가 이해할 수 있는 UserDetails 로 변환
@@ -29,12 +25,17 @@ public class AccountService implements UserDetailsService {
         Account account = accountRepository.findByEmail(username).orElseThrow(
                 () -> new UsernameNotFoundException("Account not found with username: " + username)
         );
-        return new User(account.getEmail(), account.getPassword(), authorities(account.getRoles()));
+
+
+        return User.builder()
+                .username(account.getEmail())
+                .password(account.getPassword())
+                .roles(account.getRoles().iterator().next().name())
+                .build();
     }
 
-    private Collection<? extends GrantedAuthority> authorities(Set<AccountRole> roles) {
-        return roles.stream()
-                .map(r -> new SimpleGrantedAuthority("ROLE_" + r.name()))
-                .collect(Collectors.toSet());
+    public Account saveAccount(Account account) {
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
+        return accountRepository.save(account);
     }
 }

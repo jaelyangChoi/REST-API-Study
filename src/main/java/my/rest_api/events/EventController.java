@@ -33,7 +33,7 @@ public class EventController {
     private final EventValidator eventValidator;
 
     @PostMapping
-    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
+    public ResponseEntity<?> createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
         if (errors.hasErrors()) {
             return badRequest(errors);
         }
@@ -56,7 +56,7 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
+    public ResponseEntity<?> queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
         Page<Event> page = eventRepository.findAll(pageable);
         //Page 를 PageResource 로 변환해서 받기 -> 링크 생성
         PagedModel<EntityModel<Event>> pagedResources = assembler.toModel(page, EventResource::new);
@@ -69,7 +69,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getEvent(@PathVariable Integer id) {
+    public ResponseEntity<?> getEvent(@PathVariable Integer id) {
         Optional<Event> optionalEvent = eventRepository.findById(id);
         if (optionalEvent.isEmpty()) {
             return ResponseEntity.notFound().build(); //build()는 응답 구성을 완료하고 최종 객체를 반환하는 데 사용
@@ -81,7 +81,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity updateEntity(@PathVariable Integer id,
+    public ResponseEntity<?> updateEntity(@PathVariable Integer id,
                                        @RequestBody @Valid EventDto eventDto,
                                        Errors errors) {
         Optional<Event> optionalEvent = eventRepository.findById(id);
