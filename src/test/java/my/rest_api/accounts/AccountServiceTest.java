@@ -1,5 +1,6 @@
 package my.rest_api.accounts;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.*;
 
 
 @RunWith(SpringRunner.class)
@@ -58,6 +58,8 @@ class AccountServiceTest {
         } catch (UsernameNotFoundException e) {
             assertThat(e.getMessage()).containsSequence(username);
         }
+
+//        Assertions.assertThrows(UsernameNotFoundException.class, () -> accountService.loadUserByUsername(username));
     }
 
 }

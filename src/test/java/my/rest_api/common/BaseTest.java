@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureRestDocs
+@AutoConfigureRestDocs //REST Docs 자동 설정
 @Import(RestDocsConfiguration.class)
 @ActiveProfiles("test")
 @Disabled
