@@ -3,6 +3,7 @@ package my.rest_api.configs;
 import my.rest_api.accounts.Account;
 import my.rest_api.accounts.AccountRole;
 import my.rest_api.accounts.AccountService;
+import my.rest_api.common.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -26,14 +27,24 @@ public class AppConfig {
             @Autowired
             AccountService accountService;
 
+            @Autowired
+            AppProperties appProperties;
+
             @Override
             public void run(ApplicationArguments args) throws Exception {
-                Account testAccount = Account.builder()
-                        .email("test@email.com")
-                        .password("test")
+                Account testAdmin = Account.builder()
+                        .email(appProperties.getAdminUsername())
+                        .password(appProperties.getAdminPassword())
                         .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                         .build();
-                accountService.saveAccount(testAccount);
+                accountService.saveAccount(testAdmin);
+
+                Account testUser = Account.builder()
+                        .email(appProperties.getUserUsername())
+                        .password(appProperties.getUserPassword())
+                        .roles(Set.of(AccountRole.USER))
+                        .build();
+                accountService.saveAccount(testUser);
             }
         };
     }
