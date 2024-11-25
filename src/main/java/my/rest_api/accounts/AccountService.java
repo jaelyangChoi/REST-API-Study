@@ -30,12 +30,12 @@ public class AccountService implements UserDetailsService {
         return User.builder()
                 .username(account.getEmail())
                 .password(account.getPassword())
-                .roles(account.getRoles().iterator().next().name())
+                .roles(account.getRole().name())
                 .build();
     }
 
     public Account saveAccount(Account account) {
-        account.setPassword(passwordEncoder.encode(account.getPassword()));
+        account.encodePassword(passwordEncoder);
         return accountRepository.save(account);
     }
 }

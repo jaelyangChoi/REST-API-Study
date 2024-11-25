@@ -1,10 +1,11 @@
 package my.rest_api.accounts;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter @Setter @EqualsAndHashCode(of = "id")
@@ -19,7 +20,9 @@ public class Account {
 
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    private Set<AccountRole> roles = new HashSet<>();
+    private AccountRole role;
+
+    public void encodePassword(PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(this.password);
+    }
 }
