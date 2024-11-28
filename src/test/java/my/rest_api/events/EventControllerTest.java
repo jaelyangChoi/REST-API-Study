@@ -1,6 +1,8 @@
 package my.rest_api.events;
 
+import jakarta.transaction.Transactional;
 import my.rest_api.accounts.Account;
+import my.rest_api.accounts.AccountRepository;
 import my.rest_api.accounts.AccountRole;
 import my.rest_api.accounts.AccountService;
 import my.rest_api.common.AppProperties;
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Transactional
 public class EventControllerTest extends BaseTest {
 
     @Autowired
@@ -37,6 +40,9 @@ public class EventControllerTest extends BaseTest {
 
     @Autowired
     AccountService accountService;
+
+    @Autowired
+    AccountRepository accountRepository;
 
     @Test
     @TestDescription("정상적으로 이벤트를 생성하는 테스트")
@@ -121,7 +127,6 @@ public class EventControllerTest extends BaseTest {
     }
 
     private String getAccessToken(boolean needToCreateAccount) throws Exception {
-        //Given
         if (needToCreateAccount) {
             createAccount();
         }
@@ -240,10 +245,33 @@ public class EventControllerTest extends BaseTest {
     }
 
     @Test
+    @DisplayName("인증한 사용자가 30개의 이벤트를 10개씩 두번째 페이지 조회하기")
+    public void queryEventsWithAuthentication() throws Exception {
+        // Given
+        IntStream.range(0, 30).forEach(this::generateEvent);
+
+        // When & Then
+        this.mockMvc.perform(get("/api/events")
+                        .header("access", getAccessToken(false))
+                        .param("page", "1")
+                        .param("size", "10")
+                        .param("sort", "name,DESC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_embedded.eventList[0]._links.self").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andExpect(jsonPath("_links.create-event").exists())
+                .andDo(document("query-events"))
+        ;
+    }
+
+    @Test
     @DisplayName("기존의 이벤트를 하나 조회하기")
     public void getEvent() throws Exception {
         // Given
-        Event event = generateEvent(100);
+        Event event = generateEvent(100, accountRepository.findByEmail(appProperties.getUserUsername()).orElseThrow(NullPointerException::new));
 
         // When & Then
         mockMvc.perform(get("/api/events/{id}", event.getId()))
@@ -269,7 +297,8 @@ public class EventControllerTest extends BaseTest {
     @DisplayName("이벤트를 정상 수정하고 이벤트 리소스 응답받기")
     public void updateEvent() throws Exception {
         // Given
-        Event event = generateEvent(100);
+        Account account = accountRepository.findByEmail(appProperties.getUserUsername()).orElseThrow(NullPointerException::new);
+        Event event = generateEvent(100, account);
 
         // When
         EventDto eventDto = modelMapper.map(event, EventDto.class);
@@ -346,8 +375,19 @@ public class EventControllerTest extends BaseTest {
         ;
     }
 
+    private Event generateEvent(int index, Account account) {
+        Event event = buildEvent(index);
+        event.setManager(account);
+        return eventRepository.save(event);
+    }
+
     private Event generateEvent(int index) {
-        Event event = Event.builder()
+        Event event = buildEvent(index);
+        return eventRepository.save(event);
+    }
+
+    private Event buildEvent(int index) {
+        return Event.builder()
                 .name("test" + index)
                 .description("REST API Development with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2024, 10, 21, 19, 30))
@@ -362,9 +402,5 @@ public class EventControllerTest extends BaseTest {
                 .offline(false)
                 .eventStatus(EventStatus.DRAFT)
                 .build();
-
-
-        eventRepository.save(event);
-        return event;
     }
 }

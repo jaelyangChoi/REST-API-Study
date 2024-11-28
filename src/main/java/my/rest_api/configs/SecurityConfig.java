@@ -52,7 +52,7 @@ public class SecurityConfig {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        return RoleHierarchyImpl.fromHierarchy("ROLE_ADMIN > ROLE_USER");
+        return RoleHierarchyImpl.fromHierarchy("ADMIN > USER");
     }
 
     @Bean
@@ -79,7 +79,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/events/**").authenticated()
+                        .anyRequest().authenticated()
                 );
 
         //세션 설정

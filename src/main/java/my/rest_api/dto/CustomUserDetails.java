@@ -34,4 +34,9 @@ public class CustomUserDetails implements UserDetails {
         });
         return authorities;
     }
+
+    //사용자 정보를 파라미터로 전달할 때 사용 @AuthenticatedPrincipal
+    public Account getAccount() {
+        return account;
+    }
 }
