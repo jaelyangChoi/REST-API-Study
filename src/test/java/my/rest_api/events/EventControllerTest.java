@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
@@ -166,6 +165,7 @@ public class EventControllerTest extends BaseTest {
                 .build();
 
         mockMvc.perform(post("/api/events")
+                        .header("access", getAccessToken(false))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaTypes.HAL_JSON)
                         .content(objectMapper.writeValueAsString(event)))
@@ -180,6 +180,7 @@ public class EventControllerTest extends BaseTest {
         EventDto eventDto = EventDto.builder().build();
 
         this.mockMvc.perform(post("/api/events")
+                        .header("access", getAccessToken(false))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(eventDto))
                         .accept(MediaTypes.HAL_JSON))
@@ -204,6 +205,7 @@ public class EventControllerTest extends BaseTest {
                 .build();
 
         this.mockMvc.perform(post("/api/events")
+                        .header("access", getAccessToken(false))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(eventDto))
                         .accept(MediaTypes.HAL_JSON))
@@ -276,6 +278,7 @@ public class EventControllerTest extends BaseTest {
 
         // Then
         mockMvc.perform(put("/api/events/{id}", event.getId())
+                        .header("access", getAccessToken(false))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(eventDto))
                         .accept(MediaTypes.HAL_JSON)
@@ -295,6 +298,7 @@ public class EventControllerTest extends BaseTest {
     public void updateEvent404() throws Exception {
         EventDto eventDto = EventDto.builder().build();
         mockMvc.perform(put("/api/events/12345")
+                        .header("access", getAccessToken(false))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(eventDto))
                         .accept(MediaTypes.HAL_JSON))
@@ -311,6 +315,7 @@ public class EventControllerTest extends BaseTest {
 
         // When & Then
         mockMvc.perform(put("/api/events/{id}", event.getId())
+                        .header("access", getAccessToken(false))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(eventDto))
                         .accept(MediaTypes.HAL_JSON)
@@ -332,6 +337,7 @@ public class EventControllerTest extends BaseTest {
 
         // Then
         mockMvc.perform(put("/api/events/{id}", event.getId())
+                        .header("access", getAccessToken(false))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(eventDto))
                         .accept(MediaTypes.HAL_JSON)
