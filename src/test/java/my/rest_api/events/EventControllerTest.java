@@ -1,5 +1,9 @@
 package my.rest_api.events;
 
+import my.rest_api.accounts.Account;
+import my.rest_api.accounts.AccountRole;
+import my.rest_api.accounts.AccountService;
+import my.rest_api.common.AppProperties;
 import my.rest_api.common.BaseTest;
 import my.rest_api.common.TestDescription;
 import org.hamcrest.Matchers;
@@ -9,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
@@ -22,11 +28,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
 public class EventControllerTest extends BaseTest {
 
     @Autowired
     EventRepository eventRepository;
+
+    @Autowired
+    AppProperties appProperties;
+
+    @Autowired
+    AccountService accountService;
 
     @Test
     @TestDescription("정상적으로 이벤트를 생성하는 테스트")
@@ -45,6 +56,7 @@ public class EventControllerTest extends BaseTest {
                 .build();
 
         mockMvc.perform(post("/api/events")
+                        .header("access", getAccessToken(false))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaTypes.HAL_JSON)
                         .content(objectMapper.writeValueAsString(event)))
@@ -107,6 +119,30 @@ public class EventControllerTest extends BaseTest {
                 ))
         ;
 
+    }
+
+    private String getAccessToken(boolean needToCreateAccount) throws Exception {
+        //Given
+        if (needToCreateAccount) {
+            createAccount();
+        }
+
+        ResultActions perform = mockMvc.perform(post("/login")
+                .param("username", appProperties.getUserUsername())
+                .param("password", appProperties.getUserPassword()));
+
+        return perform.andReturn().getResponse().getHeader("access");
+    }
+
+    private Account createAccount() {
+        String username = appProperties.getUserUsername();
+        String password = appProperties.getUserPassword();
+        Account account = Account.builder()
+                .email(username)
+                .password(password)
+                .role(AccountRole.USER)
+                .build();
+        return accountService.saveAccount(account);
     }
 
     @Test
@@ -306,7 +342,7 @@ public class EventControllerTest extends BaseTest {
 
     private Event generateEvent(int index) {
         Event event = Event.builder()
-                .name("test"+ index)
+                .name("test" + index)
                 .description("REST API Development with Spring")
                 .beginEnrollmentDateTime(LocalDateTime.of(2024, 10, 21, 19, 30))
                 .closeEnrollmentDateTime(LocalDateTime.of(2024, 10, 22, 19, 30))

@@ -1,5 +1,7 @@
 package my.rest_api.jwt;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,12 +9,12 @@ import my.rest_api.dto.CustomUserDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
 import java.util.Date;
 
-public class LoginFilter extends BasicAuthenticationFilter {
+public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -25,7 +27,7 @@ public class LoginFilter extends BasicAuthenticationFilter {
 
 
     @Override
-    protected void onSuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authResult) throws IOException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         // JWT 발급
         String username = ((CustomUserDetails) authResult.getPrincipal()).getUsername();
         String authority = authResult.getAuthorities().iterator().next().getAuthority();
@@ -43,7 +45,7 @@ public class LoginFilter extends BasicAuthenticationFilter {
     }
 
     @Override
-    protected void onUnsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 

@@ -1,7 +1,7 @@
 package my.rest_api.accounts;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.User;
+import my.rest_api.dto.CustomUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,11 +27,7 @@ public class AccountService implements UserDetailsService {
         );
 
 
-        return User.builder()
-                .username(account.getEmail())
-                .password(account.getPassword())
-                .roles(account.getRole().name())
-                .build();
+        return new CustomUserDetails(account);
     }
 
     public Account saveAccount(Account account) {
