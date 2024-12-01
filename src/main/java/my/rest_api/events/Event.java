@@ -1,9 +1,10 @@
 package my.rest_api.events;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 import my.rest_api.accounts.Account;
-import org.springframework.hateoas.RepresentationModel;
+import my.rest_api.accounts.AccountSerializer;
 
 import java.time.LocalDateTime;
 
@@ -35,7 +36,7 @@ public class Event {
     private EventStatus eventStatus = EventStatus.DRAFT;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
+    @JsonSerialize(using = AccountSerializer.class)
     private Account manager;
 
     public void update() {
