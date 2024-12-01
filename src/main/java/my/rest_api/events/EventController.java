@@ -3,6 +3,7 @@ package my.rest_api.events;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import my.rest_api.accounts.Account;
+import my.rest_api.accounts.AccountRepository;
 import my.rest_api.accounts.CurrentUser;
 import my.rest_api.common.ErrorsResource;
 import my.rest_api.dto.CustomUserDetails;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.security.Principal;
 import java.security.Security;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -40,6 +42,7 @@ public class EventController {
     private final EventRepository eventRepository;
     private final ModelMapper modelMapper;
     private final EventValidator eventValidator;
+    private final AccountRepository accountRepository;
 
     @PostMapping
     public ResponseEntity<?> createEvent(@RequestBody @Valid EventDto eventDto, Errors errors,
@@ -54,7 +57,8 @@ public class EventController {
 
         Event event = modelMapper.map(eventDto, Event.class);
         event.update();
-        event.setManager(currentUser);
+        event.setManager(accountRepository.findByEmail(currentUser.getEmail())
+                .orElseThrow(NoSuchElementException::new));
         Event newEvent = this.eventRepository.save(event);
         WebMvcLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
         URI createdUri = selfLinkBuilder.toUri();
@@ -119,10 +123,10 @@ public class EventController {
         if (errors.hasErrors()) {
             return badRequest(errors);
         }
-
         //Service 없이 merge 이용
         Event existingEvent = optionalEvent.get();
-        if (!existingEvent.getManager().equals(currentUser)) {
+        if (!existingEvent.getManager().equals(accountRepository.findByEmail(currentUser.getEmail())
+                .orElseThrow(NoSuchElementException::new))) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 

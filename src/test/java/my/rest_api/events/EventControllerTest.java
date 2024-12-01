@@ -305,6 +305,9 @@ public class EventControllerTest extends BaseTest {
         String eventName = "Updated Event";
         eventDto.setName(eventName);
 
+        System.out.println("account.getEmail() = " + account.getEmail());
+        System.out.println("event.getId() = " + event.getId());
+        
         // Then
         mockMvc.perform(put("/api/events/{id}", event.getId())
                         .header("access", getAccessToken(false))

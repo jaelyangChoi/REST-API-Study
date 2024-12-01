@@ -1,6 +1,7 @@
 package my.rest_api.accounts;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import my.rest_api.dto.CustomUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -8,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccountService implements UserDetailsService {
@@ -26,7 +28,7 @@ public class AccountService implements UserDetailsService {
                 () -> new UsernameNotFoundException("Account not found with username: " + username)
         );
 
-
+        log.info("################accountRepository.findByEmail = {}", account.getEmail());
         return new CustomUserDetails(account);
     }
 

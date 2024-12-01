@@ -1,6 +1,7 @@
 package my.rest_api.configs;
 
 import lombok.RequiredArgsConstructor;
+import my.rest_api.accounts.AccountService;
 import my.rest_api.jwt.JWTFilter;
 import my.rest_api.jwt.JWTUtil;
 import my.rest_api.jwt.LoginFilter;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
